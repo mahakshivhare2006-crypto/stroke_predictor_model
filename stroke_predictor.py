@@ -38,8 +38,8 @@ FEATURE_NAMES = ["age", "heart_disease", "hypertension", "avg_glucose_level"]
 
 FEATURE_INFO = [
     ("Age", "Years", "1 - 100", "Patient's age in years"),
-    ("Heart Disease", "Yes / No", "0 or 1", "Whether the patient has any heart disease"),
-    ("Hypertension", "Yes / No", "0 or 1", "Whether the patient has high blood pressure"),
+    ("Heart Disease", "0 / 1", "0 = No, 1 = Yes", "Whether the patient has any heart disease"),
+    ("Hypertension", "0 / 1", "0 = No, 1 = Yes", "Whether the patient has high blood pressure"),
     ("Average Glucose Level", "mg/dL", "40 - 400", "Average blood glucose level"),
 ]
 
@@ -273,18 +273,18 @@ elif page == "🔮 Single Prediction":
         col1, col2 = st.columns(2)
         with col1:
             age = st.slider("Age (years)", 1, 100, 50, 1, help="Patient's age in years")
-            hypertension_label = st.radio(
-                "Hypertension (High BP)", ["No", "Yes"], horizontal=True,
-                help="Does the patient have high blood pressure?",
+            hypertension = st.number_input(
+                "Hypertension (High BP)", min_value=0, max_value=1, value=0, step=1,
+                help="Enter 0 or 1  (0 = No high BP, 1 = Has high BP)",
             )
         with col2:
             glucose = st.slider(
                 "Average Glucose Level (mg/dL)", 40.0, 400.0, 100.0, 1.0,
                 help="Normal fasting range is roughly 70-100 mg/dL",
             )
-            heart_label = st.radio(
-                "Heart Disease", ["No", "Yes"], horizontal=True,
-                help="Does the patient have any heart disease?",
+            heart_disease = st.number_input(
+                "Heart Disease", min_value=0, max_value=1, value=0, step=1,
+                help="Enter 0 or 1  (0 = No heart disease, 1 = Has heart disease)",
             )
 
         submitted = st.form_submit_button("🔮 Predict Result")
@@ -292,8 +292,8 @@ elif page == "🔮 Single Prediction":
     if submitted:
         values = {
             "age": age,
-            "heart_disease": 1 if heart_label == "Yes" else 0,
-            "hypertension": 1 if hypertension_label == "Yes" else 0,
+            "heart_disease": int(heart_disease),
+            "hypertension": int(hypertension),
             "avg_glucose_level": glucose,
         }
         df_in = pd.DataFrame([values])
@@ -332,7 +332,7 @@ elif page == "🔮 Single Prediction":
                 pd.DataFrame(
                     {
                         "Feature": ["Age", "Heart Disease", "Hypertension", "Avg Glucose Level"],
-                        "Value": [age, heart_label, hypertension_label, glucose],
+                        "Value": [age, int(heart_disease), int(hypertension), glucose],
                     }
                 ),
                 use_container_width=True,
